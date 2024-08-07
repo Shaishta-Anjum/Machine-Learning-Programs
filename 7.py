@@ -1,28 +1,21 @@
-import os
-import pandas as pd
-from sklearn.cluster import KMeans
-from sklearn.mixture import GaussianMixture
-from sklearn.metrics import silhouette_score
-import matplotlib.pyplot as plt
-import seaborn as sns# Set the environment variable to avoid the memory leak warning
-os.environ['OMP_NUM_THREADS'] = '1'# Sample dataset
-data = {
-'Feature1': [1.0, 1.1, 0.9, 5.0, 5.1, 4.9, 9.0, 9.1, 8.9],
-'Feature2': [2.0, 2.1, 1.9, 6.0, 6.1, 5.9, 10.0, 10.1, 9.9]
-}# Create DataFrame
-df = pd.DataFrame(data)# Convert data to numpy array
-X = df.values# K-means Clustering
-kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)  # Set n_init explicitly to suppress the warning
-kmeans_labels = kmeans.fit_predict(X)# EM Algorithm (Gaussian Mixture Model)
-gmm = GaussianMixture(n_components=3, random_state=42)  # Assuming 3 clusters
-gmm_labels = gmm.fit_predict(X)# Calculate silhouette scores
-kmeans_silhouette = silhouette_score(X, kmeans_labels)
-gmm_silhouette = silhouette_score(X, gmm_labels)print(f"K-means Silhouette Score: {kmeans_silhouette}")
-print(f"EM Silhouette Score: {gmm_silhouette}")# Visualize the clustering results
-plt.figure(figsize=(14, 6))# K-means clustering result
-plt.subplot(1, 2, 1)
-sns.scatterplot(x=X[:, 0], y=X[:, 1], hue=kmeans_labels, palette='viridis')
-plt.title('K-means Clustering')# EM clustering result
-plt.subplot(1, 2, 2)
-sns.scatterplot(x=X[:, 0], y=X[:, 1], hue=gmm_labels, palette='viridis')
-plt.title('EM Clustering (Gaussian Mixture Model)')plt.show()
+#Apply EM algorithm to cluster a set of data stored in a .CSV file. Use the same data set for clustering using k-Means algorithm. Compare the results of these two algorithms and comment on the quality of clustering. You can add Python ML library classes/API in the program.
+
+from sklearn.datasets import load_iris
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import train_test_split
+import numpy as np
+
+dataset=load_iris()
+X_train,X_test,y_train,y_test=train_test_split(dataset["data"],dataset["target"],random_state=0)
+
+kn=KNeighborsClassifier(n_neighbors=1)
+kn.fit(X_train,y_train)
+
+for i in range(len(X_test)):
+    x=X_test[i]
+    x_new=np.array([x])
+    prediction=kn.predict(x_new)
+    print("TARGET=",y_test[i],dataset["target_names"][y_test[i]],"PREDICTED=",prediction,dataset["target_names"][prediction])
+
+print("Accuracy of clustering:")
+print(kn.score(X_test,y_test))
